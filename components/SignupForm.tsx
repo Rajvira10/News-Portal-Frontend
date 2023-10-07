@@ -1,8 +1,8 @@
-"use client";
 import React from "react";
 import { useForm, Controller, SubmitHandler } from "react-hook-form";
 import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
+import { useRouter } from "next/navigation";
 
 type Inputs = {
   username: string;
@@ -12,16 +12,20 @@ type Inputs = {
 };
 
 const SignupForm = () => {
+  const router = useRouter();
+
   const { mutate: signUp, isLoading } = useMutation({
     mutationFn: async (data: Inputs) => {
-      const res = await axios.post("http://localhost:3000/api/users", data);
+      const res = await axios.post("http://localhost:5000/api/users", data);
       const json = await res.data;
       return json;
     },
     onError: (error) => {
       console.log(error);
     },
-    onSuccess: () => {},
+    onSuccess: async (data) => {
+      router.push(`/otp?email=${encodeURIComponent(data.user.email)}`);
+    },
   });
 
   const {
@@ -38,13 +42,13 @@ const SignupForm = () => {
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
-      className="mx-auto max-w-2xl px-16 py-20 border-[#27272A] border-2 rounded-lg shadow-2xl"
+      className="mx-auto max-w-xl px-6 py-8 border rounded-lg shadow-lg bg-yellow-200 text-black"
     >
-      <h1 className="text-2xl font-semibold text-white text-center mb-5">
-        Create an account
+      <h1 className="text-4xl font-semibold  text-center mb-5">
+        Create an Account
       </h1>
-      <div className="mb-2">
-        <label htmlFor="username" className="text-white font-medium ">
+      <div className="mb-4">
+        <label htmlFor="username" className="font-bold">
           Username
         </label>
         <Controller
@@ -57,7 +61,7 @@ const SignupForm = () => {
               {...field}
               type="text"
               id="username"
-              className="mt-2 h-10 px-4 pt-2 pb-3 block w-full sm:text-sm rounded-md shadow outline-none border border-[#27272A] focus:border-slate-200 bg-inherit text-white"
+              className="mt-2 h-10 px-4 py-2 block w-full text-gray-800 sm:text-sm rounded-md shadow-md outline-none "
               placeholder="Username"
             />
           )}
@@ -67,8 +71,8 @@ const SignupForm = () => {
         )}
       </div>
 
-      <div className="mb-2">
-        <label htmlFor="email" className="text-white font-medium">
+      <div className="mb-4">
+        <label htmlFor="email" className=" font-bold">
           Email
         </label>
         <Controller
@@ -87,7 +91,7 @@ const SignupForm = () => {
               {...field}
               type="text"
               id="email"
-              className="mt-2 h-10 px-4 pt-2 pb-3 block w-full sm:text-sm rounded-md shadow outline-none border border-[#27272A] focus:border-slate-200 bg-inherit text-white"
+              className="mt-2 h-10 px-4 py-2 block w-full text-gray-800 sm:text-sm rounded-md shadow-md outline-none "
               placeholder="Email"
             />
           )}
@@ -97,8 +101,8 @@ const SignupForm = () => {
         )}
       </div>
 
-      <div className="mb-2">
-        <label htmlFor="password" className="text-white font-medium">
+      <div className="mb-4">
+        <label htmlFor="password" className=" font-bold">
           Password
         </label>
         <Controller
@@ -111,8 +115,8 @@ const SignupForm = () => {
               {...field}
               type="password"
               id="password"
-              className="mt-2 h-10 px-4 pt-2 pb-3 block w-full sm:text-sm rounded-md shadow outline-none border border-[#27272A] focus:border-slate-200 bg-inherit text-white"
-              placeholder=""
+              className="mt-2 h-10 px-4 py-2 block w-full text-gray-800 sm:text-sm rounded-md shadow-md outline-none "
+              placeholder="Password"
             />
           )}
         />
@@ -121,8 +125,8 @@ const SignupForm = () => {
         )}
       </div>
 
-      <div className="mb-2">
-        <label htmlFor="confirmPassword" className="text-white font-medium">
+      <div className="mb-4">
+        <label htmlFor="confirmPassword" className=" font-bold">
           Confirm Password
         </label>
         <Controller
@@ -138,8 +142,8 @@ const SignupForm = () => {
               {...field}
               type="password"
               id="confirmPassword"
-              className="mt-2 h-10 px-4 pt-2 pb-3 block w-full sm:text-sm rounded-md shadow outline-none border border-[#27272A] focus:border-slate-200 bg-inherit text-white"
-              placeholder=""
+              className="mt-2 h-10 px-4 py-2 block w-full text-gray-800 sm:text-sm rounded-md shadow-md outline-none "
+              placeholder="Confirm Password"
             />
           )}
         />
@@ -149,13 +153,18 @@ const SignupForm = () => {
           </span>
         )}
       </div>
-
+      <div>
+        Already have an account?{" "}
+        <a href="/login" className="text-blue-500 hover:text-blue-600 font-bold">
+          Login
+        </a>
+      </div>
       <button
         disabled={isLoading}
         type="submit"
-        className="mt-4 bg-white font-semibold text-black text-sm w-full px-6 py-2 rounded-md hover:bg-gray-100 outline-none"
+        className="mt-4 bg-green-900 hover:bg-green-950 text-white  font-semibold text-sm w-full px-6 py-2 rounded-md outline-none"
       >
-        Create Account
+        {isLoading ? "Creating Account..." : "Create Account"}
       </button>
     </form>
   );
